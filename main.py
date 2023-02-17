@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi import Body
+from fastapi import Body, Path, Query
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -16,8 +16,8 @@ class Movie(BaseModel):
     title: str = Field(mins_length=5, max_length=15)
     overview: str = Field(mins_length=5, max_length=50)
     year: int = Field(default=2022 , le=2022)
-    rating: float
-    category: str
+    rating: float = Field(ge=1 , le=10)
+    category: str = Field(min_length=5 , max_length=15)
 
     class Config:
         schema_extra = {
@@ -74,14 +74,14 @@ def get_movies():
 
 
 @app.get('/movie/{id}', tags=['movies'])
-def get_movie(id: int):
+def get_movie(id: int = Path(ge = 1, le = 2000)):
     movie = list(filter(lambda x: x['id'] == id, movies))
     return movie or 'No hay nada pai'
 
 
 @app.get('/movies/', tags=['movies'])
-def get_movies_by_category(category: str, year: int):
-    movies_filter = list(filter(lambda x: x['category'] == category or x['year'] == year, movies))
+def get_movies_by_category(category: str = Query(min_length=5, max_length=15)):
+    movies_filter = list(filter(lambda x: x['category'] == category, movies))
     return movies_filter or 'noting pai'
 
 
