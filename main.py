@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi import Body
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 from fastapi.responses import HTMLResponse
@@ -13,11 +13,24 @@ app.version = "0.0.1"
 
 class Movie(BaseModel):
     id: Optional[int] = None
-    title: str
-    overview: str
-    year: int
+    title: str = Field(mins_length=5, max_length=15)
+    overview: str = Field(mins_length=5, max_length=50)
+    year: int = Field(default=2022 , le=2022)
     rating: float
     category: str
+
+    class Config:
+        schema_extra = {
+            'example': {
+                'id': 1,
+                'title': 'Mi pelicula',
+                'overview': "Descripccion de la pelicula",
+                'year': 2022,
+                'rating': 9.8,
+                'category': 'Acción'
+            }
+        }
+
 
 movies = [
     {
